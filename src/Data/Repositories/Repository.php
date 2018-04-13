@@ -43,44 +43,64 @@ abstract class Repository implements RepositoryInterface
 
     public function first()
     {
-        $this->result = $this->builder->first();
+        try{
+            $this->result = $this->builder->first();
+        }
+        catch (\Exception $e){
+            return null;
+        }
+
 
         return $this->result ? $this : null;
     }
 
     public function find($id)
     {
-        list($model, $cacheKey) = $this->cache->findCached($id, null, $this->className);
+        try{
+            $this->result = $this->builder->first();
 
-        if (!$model) {
-            $model = $this->newQuery();
 
-            if ($this->relations) {
-                $model->with($this->relations);
+            list($model, $cacheKey) = $this->cache->findCached($id, null, $this->className);
+
+            if (!$model) {
+                $model = $this->newQuery();
+
+                if ($this->relations) {
+                    $model->with($this->relations);
+                }
+
+                if ($model = $model->find($id)) {
+                    $this->cache->cachePut($cacheKey, $model);
+                }
             }
 
-            if ($model = $model->find($id)) {
-                $this->cache->cachePut($cacheKey, $model);
-            }
+            $this->model = $model;
+            $this->result = $model;
+
         }
-
-        $this->model = $model;
-        $this->result = $model;
+        catch (\Exception $e){
+            return null;
+        }
 
         return $model;
     }
 
     public function create($attributes, $model = null)
     {
-        $model = $model && !$model->exists() ? $model : $this->newModel($model);
+        try{
+            $model = $model && !$model->exists() ? $model : $this->newModel($model);
 
-        foreach ($attributes as $attribute => $value) {
-            if (in_array($attribute, $model->getFillable())) {
-                $model->{$attribute} = $value;
+            foreach ($attributes as $attribute => $value) {
+                if (in_array($attribute, $model->getFillable())) {
+                    $model->{$attribute} = $value;
+                }
             }
-        }
 
-        $model->save();
+            $model->save();
+        }
+        catch (\Exception $e){
+            return null;
+        }
 
         return $model;
     }
@@ -105,7 +125,13 @@ abstract class Repository implements RepositoryInterface
 
     public function save()
     {
-        return $this->result->save();
+        try{
+            return $this->result->save();
+        }
+        catch (\Exception $e){
+            return null;
+        }
+
     }
 
     /**
@@ -113,29 +139,37 @@ abstract class Repository implements RepositoryInterface
      */
     public function findOrCreate($attributes, $keys = null, &$created = false, $otherModel = null)
     {
-        list($model, $cacheKey) = $this->cache->findCached($attributes, $keys, $this->className);
+        try{
 
-        if (!$model) {
-            $model = $this->newQuery($otherModel);
 
-            $keys = $keys ?: array_keys($attributes);
+            list($model, $cacheKey) = $this->cache->findCached($attributes, $keys, $this->className);
 
-            foreach ($keys as $key) {
-                $model = $model->where($key, $attributes[$key]);
+            if (!$model) {
+                $model = $this->newQuery($otherModel);
+
+                $keys = $keys ?: array_keys($attributes);
+
+                foreach ($keys as $key) {
+                    $model = $model->where($key, $attributes[$key]);
+                }
+
+                if (!$model = $model->first()) {
+                    $model = $this->create($attributes, $otherModel);
+
+                    $created = true;
+                }
+
+                $this->cache->cachePut($cacheKey, $model);
             }
 
-            if (!$model = $model->first()) {
-                $model = $this->create($attributes, $otherModel);
+            $this->model = $model;
 
-                $created = true;
-            }
+            return $model->id;
 
-            $this->cache->cachePut($cacheKey, $model);
         }
-
-        $this->model = $model;
-
-        return $model->id;
+        catch (\Exception $e){
+            return null;
+        }
     }
 
     public function getModel()
