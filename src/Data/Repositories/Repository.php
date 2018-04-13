@@ -140,8 +140,6 @@ abstract class Repository implements RepositoryInterface
     public function findOrCreate($attributes, $keys = null, &$created = false, $otherModel = null)
     {
         try{
-
-
             list($model, $cacheKey) = $this->cache->findCached($attributes, $keys, $this->className);
 
             if (!$model) {
