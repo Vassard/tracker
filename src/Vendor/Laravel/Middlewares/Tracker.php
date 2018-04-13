@@ -22,6 +22,9 @@ class Tracker
                 app('tracker')->boot();
             }
         }catch (\Exception $e){
+            if(env("DEBUG", false))
+                return;
+
             return $next($request);
         }
 
