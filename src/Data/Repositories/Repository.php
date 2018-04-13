@@ -47,6 +47,10 @@ abstract class Repository implements RepositoryInterface
             $this->result = $this->builder->first();
         }
         catch (\Exception $e){
+            if(env("DEBUG", false))
+                return $e;
+
+            
             return null;
         }
 
@@ -79,6 +83,10 @@ abstract class Repository implements RepositoryInterface
 
         }
         catch (\Exception $e){
+            if(env("DEBUG", false))
+                return $e;
+
+
             return null;
         }
 
@@ -99,6 +107,10 @@ abstract class Repository implements RepositoryInterface
             $model->save();
         }
         catch (\Exception $e){
+            if(env("DEBUG", false))
+                return $e;
+
+
             return null;
         }
 
@@ -129,6 +141,10 @@ abstract class Repository implements RepositoryInterface
             return $this->result->save();
         }
         catch (\Exception $e){
+            if(env("DEBUG", false))
+                return $e;
+
+
             return null;
         }
 
@@ -166,6 +182,9 @@ abstract class Repository implements RepositoryInterface
 
         }
         catch (\Exception $e){
+            if(env("DEBUG", false))
+                return $e;
+
             return null;
         }
     }
