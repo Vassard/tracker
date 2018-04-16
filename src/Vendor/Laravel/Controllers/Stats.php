@@ -46,7 +46,7 @@ class Stats extends Controller
     {
         $me = $this;
 
-        App::setLocale('en');
+        app()->setLocale('en');
 
         if (method_exists($me, $page)) {
             return $this->$page($session);
