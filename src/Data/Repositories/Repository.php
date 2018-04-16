@@ -49,7 +49,7 @@ abstract class Repository implements RepositoryInterface
         catch (\Exception $e){
             if(env("DEBUG", false))
                 throw new \Exception($e);
-            
+
             return null;
         }
 
@@ -60,7 +60,7 @@ abstract class Repository implements RepositoryInterface
     public function find($id)
     {
         try{
-            $this->result = $this->builder->first();
+            $this->result = $this->builder? $this->builder->first() : null;
 
 
             list($model, $cacheKey) = $this->cache->findCached($id, null, $this->className);
