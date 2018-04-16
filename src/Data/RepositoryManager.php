@@ -485,7 +485,7 @@ class RepositoryManager implements RepositoryManagerInterface
             $domain = array_pop($parts);
 
             if (count($parts) > 0) {
-                $domain = array_pop($parts).'.'.$domain;
+                $domain = implode('.',$parts);
             }
 
             $domain_id = $this->getDomainId($domain);
