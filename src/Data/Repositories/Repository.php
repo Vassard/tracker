@@ -48,8 +48,7 @@ abstract class Repository implements RepositoryInterface
         }
         catch (\Exception $e){
             if(env("DEBUG", false))
-                return $e;
-
+                throw new \Exception($e);
             
             return null;
         }
