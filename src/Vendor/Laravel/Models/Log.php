@@ -18,6 +18,7 @@ class Log extends Base
         'is_json',
         'wants_json',
         'error_id',
+        'organization_id',
     ];
 
     public function session()

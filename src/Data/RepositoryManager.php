@@ -480,18 +480,25 @@ class RepositoryManager implements RepositoryManagerInterface
                 return;
             }
 
-            $parts = explode('.', $url['host']);
-
-            $domain = array_pop($parts);
-
-            if (count($parts) > 0) {
-                $domain = implode('.',$parts);
-            }
+            $domain = $this->getDomain($url);
 
             $domain_id = $this->getDomainId($domain);
 
             return $this->refererRepository->store($referer, $url['host'], $domain_id);
         }
+    }
+
+
+    private  function getDomain($url){
+        $parts = explode('.', $url['host']);
+
+        $domain = array_pop($parts);
+
+        if (count($parts) > 0) {
+            $domain = implode('.',$parts);
+        }
+
+        return $domain;
     }
 
     /**
@@ -533,12 +540,15 @@ class RepositoryManager implements RepositoryManagerInterface
     /**
      * @param string $name
      */
-    private function getRouteId($name, $action)
+    private function getRouteId($name, $action, $host)
     {
-        return $this->routeRepository->findOrCreate(
-            ['name' => $name, 'action' => $action],
-            ['name', 'action']
-        );
+
+
+        return ($this->routeRepository->findOrCreate(
+            ['name' => $name, 'action' => $action, 'host' => $host],
+            ['name', 'action', 'host']
+        ));
+
     }
 
     /**
@@ -585,11 +595,12 @@ class RepositoryManager implements RepositoryManagerInterface
     {
         $route_id = $this->getRouteId(
             $this->getRouteName($route),
-            $this->getRouteAction($route)
-                ?: 'closure'
+            $this->getRouteAction($route) ?: 'closure',
+            $this->getDomain(parse_url($request->headers->get('referer')))
         );
 
         $created = false;
+
 
         $route_path_id = $this->getRoutePath(
             $route_id,

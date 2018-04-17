@@ -17,6 +17,7 @@ class Session extends Base
         'referer_id',
         'geoip_id',
         'is_robot',
+        'organization_id',
     ];
 
     public function __construct(array $attributes = [])

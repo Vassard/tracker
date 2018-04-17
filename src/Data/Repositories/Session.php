@@ -132,7 +132,7 @@ class Session extends Repository
         $wasComplete = true;
 
         foreach ($this->sessionInfo as $key => $value) {
-            if ($sessionData[$key] !== $value) {
+            if (!isset($sessionData[$key]) || $sessionData[$key] !== $value) {
                 if (!isset($model)) {
                     $model = $this->find($this->sessionInfo['id']);
                 }
@@ -197,6 +197,7 @@ class Session extends Repository
     private function getSessionData($variable = null)
     {
         $data = $this->session->get($this->getSessionKey());
+
 
         return $variable
                 ? (isset($data[$variable]) ? $data[$variable] : null)
