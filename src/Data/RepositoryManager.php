@@ -480,7 +480,7 @@ class RepositoryManager implements RepositoryManagerInterface
                 return;
             }
 
-            $domain = $this->getDomain($url);
+            $domain = $this->getDomain($url['host']);
 
             $domain_id = $this->getDomainId($domain);
 
@@ -490,7 +490,7 @@ class RepositoryManager implements RepositoryManagerInterface
 
 
     private  function getDomain($url){
-        $parts = explode('.', $url['host']);
+        $parts = explode('.', $url);
 
         $domain = array_pop($parts);
 
@@ -593,10 +593,11 @@ class RepositoryManager implements RepositoryManagerInterface
 
     public function getRoutePathId($route, $request)
     {
+
         $route_id = $this->getRouteId(
             $this->getRouteName($route),
             $this->getRouteAction($route) ?: 'closure',
-            $this->getDomain(parse_url($request->headers->get('referer')))
+            $this->getDomain( $request->headers->get('host'))
         );
 
         $created = false;
